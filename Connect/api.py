@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
 import re
-import urllib.request
+import requests
+import urllib
 import os.path
 
+url = "https://insights.stackoverflow.com/survey"
 
 #searches current directory to see if file exists
-def search(url):
+def search():
     if os.path.isfile('{}_survey.csv'.format(date)):
         return True
     else:
@@ -17,26 +19,52 @@ def search(url):
 #url = "https://insights.stackoverflow.com/survey"
 
 #scrapes url to gather url information
-def scrape(url):
-    req = requests.get(url, headers)
-    soup = BeautifulSoup(req.content, 'htlm.parser')
-    finder = soup.find_all('a')
-    return finder
+def scrape():
+    url = requests.get("https://insights.stackoverflow.com/survey")
+    soup = BeautifulSoup(url.text, "html.parser")
+    global finder
+    finder = soup.find_all('a', href = re.compile(r'https://drive.google.com'))
+
+
 
 #collects date and url link from scraped data
-def data(finder):
-    for f in finder:
-        data = [[f.attrs['data-year'], f.attrs['href']]]
-    return data
+def get_data():
+
+    global urls
+    urls = [[f.attrs['data-year'], f.attrs['href']] for f in finder]
+
 
 #downloads data into date-stamped files
-def download(data):
-    for item in range(len(data)):
-        url = data[item][1]
-        date = data[item][0]
-        while search(url) is False:
-            print('Initiating {} Stack Overflow Survey donwload...'.format(date))
+def download():
+    for item in range(len(urls)):
+        url = urls[item][1]
+        date = urls[item][0]
 
-            urlib.request.urlretreive(url, '/home/j_yosen/Connect/{}_survey.csv'.format(date))
+        if os.path.exists('/home/j_yosen/Data_Platform/Connect/Surveys/{}_survey.csv'.format(date)):
+            print("The {} Survey already exists".format(date) + "\n")
 
-            print('Download Complete. Have a nice day :)')
+
+        else:
+
+            print('<Initiating {} Stack Overflow Survey Download>'.format(date) + "\n")
+
+            file = requests.get(url)
+
+
+
+            with open('/home/j_yosen/Data_Platform/Connect/Surveys/{}_survey.csv'.format(date), 'wb') as f:
+                f.write(file.content)
+
+            print('***BEEP BOOP*** {} Survey Download Complete. Have a nice day :)'.format(date) + "\n")
+
+
+
+    print("Process Complete. You are up to date" + "\n")
+
+if __name__ == '__main__':
+    url = "https://insights.stackoverflow.com/survey"
+    scrape()
+
+    get_data()
+
+    download()
