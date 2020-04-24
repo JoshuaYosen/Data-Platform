@@ -4,19 +4,6 @@ import requests
 import urllib
 import os.path
 
-url = "https://insights.stackoverflow.com/survey"
-
-#searches current directory to see if file exists
-def search():
-    if os.path.isfile('{}_survey.csv'.format(date)):
-        return True
-    else:
-        return False
-
-
-
-
-#url = "https://insights.stackoverflow.com/survey"
 
 #scrapes url to gather url information
 def scrape():
