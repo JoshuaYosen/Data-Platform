@@ -7,11 +7,16 @@ import os.path
 
 #scrapes url to gather url information
 def scrape():
-    url = requests.get("https://insights.stackoverflow.com/survey")
-    soup = BeautifulSoup(url.text, "html.parser")
-    global finder
-    finder = soup.find_all('a', href = re.compile(r'https://drive.google.com'))
 
+    url = requests.get("https://insights.stackoverflow.com/survey")
+
+    if urlib.urlopen(url).getcode() == 200:
+        soup = BeautifulSoup(url.text, "html.parser")
+        global finder
+        finder = soup.find_all('a', href = re.compile(r'https://drive.google.com'))
+
+    else:
+        raise Exception("Host Could Not be Found")
 
 
 #collects date and url link from scraped data
