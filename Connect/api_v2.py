@@ -13,8 +13,12 @@ class SO_Survey_API():
 
     #creates a BeautifulSoup object from website
     def get_page(self):
-        self.soup = BeautifulSoup(self.url.text, "html.parser")
-        return self.soup
+        if urlib.urlopen(url).getcode() == 200:
+            self.soup = BeautifulSoup(self.url.text, "html.parser")
+            return self.soup
+
+        else:
+            raise Exception("Host Could not be Found")
 
     #retrieves list of dates and urls for each survey
     def get_surveys(self, regex):
@@ -25,7 +29,7 @@ class SO_Survey_API():
         return self.urls
 
 
-    #downloads surveys into file of choice 
+    #downloads surveys into file of choice
     def download(self, path):
 
         for item in range(len(self.urls)):
